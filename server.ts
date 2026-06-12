@@ -261,6 +261,20 @@ app.post("/api/bookings/reset", (req, res) => {
   res.json({ success: true });
 });
 
+// Explicit sitemap.xml fallback endpoint
+app.get("/sitemap.xml", (req, res) => {
+  const fileInDist = path.join(process.cwd(), "dist", "sitemap.xml");
+  const fileInPublic = path.join(process.cwd(), "public", "sitemap.xml");
+  const filePath = fs.existsSync(fileInDist) ? fileInDist : fileInPublic;
+
+  if (fs.existsSync(filePath)) {
+    res.header("Content-Type", "application/xml; charset=utf-8");
+    res.sendFile(filePath);
+  } else {
+    res.status(404).end();
+  }
+});
+
 // Vite middleware setup
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
